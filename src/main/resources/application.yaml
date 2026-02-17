@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: campaign-server
+
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-version: 10000
