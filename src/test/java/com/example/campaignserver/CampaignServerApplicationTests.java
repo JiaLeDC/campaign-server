@@ -9,5 +9,4 @@ class CampaignServerApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
