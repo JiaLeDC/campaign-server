@@ -34,6 +34,7 @@ public class CampaignService {
         private final RecipientRepository recipientRepository;
         private final TenantRepository tenantRepository;
         private final CsvParsingService csvParsingService;
+        private final com.example.campaignserver.repository.OutboxRepository outboxRepository;
 
         /**
          * Creates a new campaign.
@@ -95,6 +96,21 @@ public class CampaignService {
                                 // Rethrow as a runtime exception or handle as needed
                                 throw new RuntimeException("Failed to process recipients CSV", e);
                         }
+                }
+
+                // Record an outbox event for background processing
+                if ("RUNNING".equals(status)) {
+                        com.example.campaignserver.entity.OutboxEvent event = com.example.campaignserver.entity.OutboxEvent
+                                        .builder()
+                                        .tenantId(tId)
+                                        .aggregateType("CAMPAIGN")
+                                        .aggregateId(campaignId)
+                                        .eventType("CAMPAIGN_CREATED")
+                                        .status("PENDING")
+                                        .payload("{}")
+                                        .build();
+                        outboxRepository.save(event);
+                        log.info("Outbox event created for campaign: {}", campaignId);
                 }
 
                 // Return the response object with basic stats
@@ -165,7 +181,8 @@ public class CampaignService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "Campaign not found: " + campaignId + " for tenant: " + tenantId));
 
-                // In this simplified implementation we do not track individual notification jobs,
+                // In this simplified implementation we do not track individual notification
+                // jobs,
                 // so there is nothing to actually retry.
                 log.info("Retry requested for campaign {} but retry logic is not implemented in simplified version.",
                                 campaignId);

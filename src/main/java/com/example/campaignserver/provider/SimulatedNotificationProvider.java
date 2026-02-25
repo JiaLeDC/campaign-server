@@ -1,5 +1,8 @@
 package com.example.campaignserver.provider;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -10,14 +13,16 @@ import java.util.Random;
  * Behaviour:
  * - Supports channels: EMAIL, SMS, PUSH
  * - Applies a simple per‑instance, per‑channel limit of 100 requests
- *   (after that, returns RATE_LIMITED)
+ * (after that, returns RATE_LIMITED)
  * - For allowed requests, randomly fails a percentage of calls to simulate
- *   provider instability.
+ * provider instability.
  *
  * This is intentionally lightweight and is not wired into the main campaign
  * flow yet; it serves to demonstrate how provider behaviour and rate limiting
  * could be tested.
  */
+@Slf4j
+@Component
 public class SimulatedNotificationProvider {
 
     private static final int MAX_REQUESTS_PER_CHANNEL = 100;
@@ -45,10 +50,11 @@ public class SimulatedNotificationProvider {
         // Simulate provider failure with ~20% probability
         boolean fail = random.nextDouble() < 0.20;
         if (fail) {
+            log.error("[SIMULATOR] FAILED to send {} to {}: PROVIDER_FAILURE", normalizedChannel, destination);
             return new ProviderResponse(false, "PROVIDER_FAILURE");
         }
 
+        log.info("[SIMULATOR] SUCCESS sending {} to {}: \"{}\"", normalizedChannel, destination, message);
         return new ProviderResponse(true, null);
     }
 }
-
