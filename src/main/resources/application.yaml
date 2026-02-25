@@ -1,17 +1,35 @@
 spring:
   application:
     name: campaign-server
-
-
   datasource:
     url: jdbc:postgresql://localhost:5432/campaign_db
     username: postgres
     password: postgres
-    driver-class-name: org.postgresql.Driver
-
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
   flyway:
     enabled: true
-    baseline-on-migrate: true        # safe for existing DBs
-    locations: classpath:db/migration # where your SQL files live
-    schemas: public                   # schema to manage
-    validate-on-migrate: true         # fail fast if scripts changed
+    baseline-on-migrate: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 110MB
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.example.campaignserver: INFO
+    org.hibernate.SQL: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
