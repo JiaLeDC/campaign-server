@@ -1,8 +1,9 @@
 package com.example.campaignserver.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
@@ -18,23 +19,19 @@ import java.time.Instant;
  * }
  * </pre>
  */
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
 
-    private final boolean success;
-    private final String message;
-    private final T data;
-    private final Instant timestamp;
+    private boolean success;
+    private String message;
+    private T data;
+    private Instant timestamp;
 
     public static <T> ApiResponse<T> ok(String message, T data) {
-        return ApiResponse.<T>builder()
-                .success(true)
-                .message(message)
-                .data(data)
-                .timestamp(Instant.now())
-                .build();
+        return new ApiResponse<>(true, message, data, Instant.now());
     }
 
     public static <T> ApiResponse<T> ok(T data) {
@@ -42,10 +39,6 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> error(String message) {
-        return ApiResponse.<T>builder()
-                .success(false)
-                .message(message)
-                .timestamp(Instant.now())
-                .build();
+        return new ApiResponse<>(false, message, null, Instant.now());
     }
 }
