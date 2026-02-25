@@ -3,7 +3,15 @@ spring:
     name: campaign-server
 
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/campaign_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
   flyway:
     enabled: true
-    locations: classpath:db/migration
-    baseline-version: 10000
+    baseline-on-migrate: true        # safe for existing DBs
+    locations: classpath:db/migration # where your SQL files live
+    schemas: public                   # schema to manage
+    validate-on-migrate: true         # fail fast if scripts changed
